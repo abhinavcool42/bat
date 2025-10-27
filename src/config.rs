@@ -111,10 +111,15 @@ pub struct Config<'a> {
 
 #[cfg(all(feature = "minimal-application", feature = "paging"))]
 pub fn get_pager_executable(config_pager: Option<&str>) -> Option<String> {
+    use crate::pager::PagerKind;
+
     crate::pager::get_pager(config_pager)
         .ok()
         .flatten()
-        .map(|pager| pager.bin)
+        .and_then(|pager| match pager.kind {
+            PagerKind::Less => Some(pager.bin),
+            _ => None,
+        })
 }
 
 #[test]
